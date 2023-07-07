@@ -1,0 +1,275 @@
+[cloudera@quickstart ~]$ hive shell
+
+Logging initialized using configuration in file:/etc/hive/conf.dist/hive-log4j.properties
+WARNING: Hive CLI is deprecated and migration to Beeline is recommended.
+hive> show databases;
+OK
+default
+flight
+Time taken: 3.575 seconds, Fetched: 2 row(s)
+hive> create database TEIT;
+OK
+Time taken: 9.824 seconds
+hive> use TEIT;
+OK
+Time taken: 0.297 seconds
+hive> create table Student(firstname string, lastname string, studid int);
+OK
+Time taken: 1.761 seconds
+hive> select * from Student;
+OK
+Time taken: 3.01 seconds
+hive> show tables;
+OK
+student
+Time taken: 0.359 seconds, Fetched: 1 row(s)
+hive> drop table Student
+    > ;
+OK
+Time taken: 1.874 seconds
+hive> show tables;
+OK
+Time taken: 0.068 seconds
+hive> create table Student(firstname string, lastname string, studid int)
+    > ROW FORMAT delimited fields terminated by ',' LINES TERMINATED BY '\n' STORED AS TEXTFILE;
+OK
+Time taken: 0.382 seconds
+hive> load data local inpath '/home/cloudera/stud_text.txt' into table Student;
+FAILED: SemanticException Line 1:23 Invalid path ''/home/cloudera/stud_text.txt'': No files matching path file:/home/cloudera/stud_text.txt
+hive> load data local inpath '/home/cloudera/stud_text.txt' into table Student;
+Loading data to table teit.student
+Table teit.student stats: [numFiles=1, totalSize=110]
+OK
+Time taken: 2.945 seconds
+hive> select * from Student;
+OK
+rakesh	 sharma	NULL
+manasi	 auti	NULL
+divya	 rathore	NULL
+john	 philip	NULL
+kevin	 jade	NULL
+simon	 kord	NULL
+Time taken: 0.351 seconds, Fetched: 6 row(s)
+
+================================================================
+
+hive> create table Emp(empid INT,empname STRING,empadd STRING);
+OK
+Time taken: 1.116 seconds
+hive> show tables;
+OK
+emp
+student
+Time taken: 0.177 seconds, Fetched: 2 row(s)
+hive> drop table emp;
+OK
+Time taken: 0.732 seconds
+hive> create table Emp(empid INT,empname STRING,empadd STRING)
+    > ROW FORMAT delimited fields terminated by ',' LINES TERMINATED BY '\n' STORED AS TEXTFILE;
+OK
+Time taken: 0.347 seconds
+hive> load data local inpath '/home/cloudera/emp_data.txt' into table emp; 
+Loading data to table teit.emp
+Table teit.emp stats: [numFiles=1, totalSize=79]
+OK
+Time taken: 2.557 seconds
+hive> select * from emp;
+OK
+1	 Kevin	 USA
+2	 John	 NYC
+3	 Mark	 Denmark
+4	 Lucas	 Korea
+5	 Watson	 America
+Time taken: 1.743 seconds, Fetched: 5 row(s)
+
+=====================================================
+hive> INSERT INTO TABLE emp VALUES (6,'Peter','London');
+Query ID = cloudera_20230525023030_79abc47b-a8d2-47d2-be93-645746acb5ca
+Total jobs = 3
+Launching Job 1 out of 3
+Number of reduce tasks is set to 0 since there's no reduce operator
+Starting Job = job_1685003622237_0001, Tracking URL = http://quickstart.cloudera:8088/proxy/application_1685003622237_0001/
+Kill Command = /usr/lib/hadoop/bin/hadoop job  -kill job_1685003622237_0001
+Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 0
+2023-05-25 02:31:39,234 Stage-1 map = 0%,  reduce = 0%
+2023-05-25 02:32:34,915 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 4.82 sec
+MapReduce Total cumulative CPU time: 4 seconds 820 msec
+Ended Job = job_1685003622237_0001
+Stage-4 is selected by condition resolver.
+Stage-3 is filtered out by condition resolver.
+Stage-5 is filtered out by condition resolver.
+Moving data to: hdfs://quickstart.cloudera:8020/user/hive/warehouse/teit.db/emp/.hive-staging_hive_2023-05-25_02-30-06_781_7808643110544344400-1/-ext-10000
+Loading data to table teit.emp
+Table teit.emp stats: [numFiles=2, numRows=1, totalSize=94, rawDataSize=14]
+MapReduce Jobs Launched: 
+Stage-Stage-1: Map: 1   Cumulative CPU: 4.82 sec   HDFS Read: 3760 HDFS Write: 79 SUCCESS
+Total MapReduce CPU Time Spent: 4 seconds 820 msec
+OK
+Time taken: 153.582 seconds
+hive> create external table hive_table_emp300(id int,name string,esal string)
+    > stored by 'org.apache.hadoop.hive.hbase.HBaseStorageHandler'
+    > with SERDEPROPERTIES("hbase.columns.mapping"=":key,cf:name,cf:esal")
+    > TBLPROPERTIES("hbase.table.name"="emphive300");
+OK
+Time taken: 2.553 seconds
+hive> create table empdbnew300(eno int,name string,esal int) row format 
+    > delimited fields terminated by ',' stored as textfile;
+OK
+Time taken: 0.251 seconds
+hive> load data local inpath '/home/cloudera/emp_data.txt' into table empdbnew300; 
+Loading data to table teit.empdbnew300
+Table teit.empdbnew300 stats: [numFiles=1, totalSize=79]
+OK
+Time taken: 0.587 seconds
+hive> select * from empdbnew300;
+OK
+1	 Kevin	NULL
+2	 John	NULL
+3	 Mark	NULL
+4	 Lucas	NULL
+5	 Watson	NULL
+Time taken: 0.202 seconds, Fetched: 5 row(s)
+hive> insert into hive_table_emp300 select * from empdbnew300;
+Query ID = cloudera_20230525030808_70c56b33-eddf-4d78-9bf5-0d159634d21e
+Total jobs = 1
+Launching Job 1 out of 1
+Number of reduce tasks is set to 0 since there's no reduce operator
+Starting Job = job_1685003622237_0002, Tracking URL = http://quickstart.cloudera:8088/proxy/application_1685003622237_0002/
+Kill Command = /usr/lib/hadoop/bin/hadoop job  -kill job_1685003622237_0002
+Hadoop job information for Stage-0: number of mappers: 1; number of reducers: 0
+2023-05-25 03:09:16,101 Stage-0 map = 0%,  reduce = 0%
+2023-05-25 03:09:43,689 Stage-0 map = 100%,  reduce = 0%, Cumulative CPU 4.58 sec
+MapReduce Total cumulative CPU time: 4 seconds 580 msec
+Ended Job = job_1685003622237_0002
+MapReduce Jobs Launched: 
+Stage-Stage-0: Map: 1   Cumulative CPU: 4.58 sec   HDFS Read: 10759 HDFS Write: 0 SUCCESS
+Total MapReduce CPU Time Spent: 4 seconds 580 msec
+OK
+Time taken: 62.735 seconds
+hive> select * from hive_table_emp300;
+OK
+1	 Kevin	NULL
+2	 John	NULL
+3	 Mark	NULL
+4	 Lucas	NULL
+5	 Watson	NULL
+Time taken: 0.246 seconds, Fetched: 5 row(s)
+hive> select * from hive_table_emp300 where name='John';
+OK
+Time taken: 0.615 seconds
+hive> select * from hive_table_emp300 where id>2;
+OK
+3	 Mark	NULL
+4	 Lucas	NULL
+5	 Watson	NULL
+Time taken: 0.33 seconds, Fetched: 3 row(s)
+hive> create external table hbase_flight_300(fno int,fsource string,fdest string, fsch_at string, fsch_dt string)
+    > stored by 'org.apache.hadoop.hive.hbase.HBaseStorageHandler'
+    > with SERDEPROPERTIES("hbase.columns.mapping"=":key,finfo:source,finfo:dest,fsch:at,fsch:dt")
+    > TBLPROPERTIES("hbase.table.name"="flight");
+OK
+Time taken: 0.326 seconds
+hive> show tables
+    > ;
+OK
+emp
+empdbnew300
+hbase_flight_300
+hive_table_emp300
+student
+values__tmp__table__1
+Time taken: 0.559 seconds, Fetched: 6 row(s)
+hive> select * from hbase_flight_300;
+OK
+1	pune	mumbai	10:25 a.m.	11:25 a.m.
+2	delhi	nagpur	11:25 a.m.	12:25 p.m.
+Time taken: 0.238 seconds, Fetched: 2 row(s)
+hive> select avg(fsch_dt) from hbase_flight_300;
+Query ID = cloudera_20230525032626_38c480ea-ec84-43c1-bdd9-4ee60278e520
+Total jobs = 1
+Launching Job 1 out of 1
+Number of reduce tasks determined at compile time: 1
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Starting Job = job_1685003622237_0003, Tracking URL = http://quickstart.cloudera:8088/proxy/application_1685003622237_0003/
+Kill Command = /usr/lib/hadoop/bin/hadoop job  -kill job_1685003622237_0003
+Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 1
+2023-05-25 03:26:59,329 Stage-1 map = 0%,  reduce = 0%
+2023-05-25 03:27:31,413 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 4.55 sec
+2023-05-25 03:27:56,488 Stage-1 map = 100%,  reduce = 100%, Cumulative CPU 7.22 sec
+MapReduce Total cumulative CPU time: 7 seconds 220 msec
+Ended Job = job_1685003622237_0003
+MapReduce Jobs Launched: 
+Stage-Stage-1: Map: 1  Reduce: 1   Cumulative CPU: 7.22 sec   HDFS Read: 7694 HDFS Write: 3 SUCCESS
+Total MapReduce CPU Time Spent: 7 seconds 220 msec
+OK
+NULL
+Time taken: 91.594 seconds, Fetched: 1 row(s)
+hive> create index hbaseflight_index300
+    > on table hbase_flight_300(fsch_dt)
+    > As 'org.apache.hadoop.hive.ql.index.compact.CompactIndexHandler'
+    > with DEFERRED REBUILD;
+OK
+Time taken: 0.919 seconds
+hive> show index on hbase_flight_300;
+OK
+hbaseflight_index300	hbase_flight_300    	fsch_dt             	teit__hbase_flight_300_hbaseflight_index300__	compact             	
+Time taken: 0.276 seconds, Fetched: 1 row(s)
+hive> create table empinfo300(empno int,empname string) row format 
+    > delimited fields terminated by ',' stored as textfile;
+OK
+Time taken: 0.165 seconds
+hive> load data local inpath '/home/cloudera/emp_info300.txt' into table empinfo300; 
+Loading data to table teit.empinfo300
+Table teit.empinfo300 stats: [numFiles=1, totalSize=64]
+OK
+Time taken: 0.654 seconds
+hive> select * from empinfo300;
+OK
+101	 Kevin
+102	 Mark
+103	 Lucas
+104	 Luffy
+105	 Tenji
+106	 Mary
+Time taken: 0.132 seconds, Fetched: 6 row(s)
+hive> select * from empdbnew300;
+OK
+1	 Kevin	NULL
+2	 John	NULL
+3	 Mark	NULL
+4	 Lucas	NULL
+5	 Watson	NULL
+Time taken: 0.141 seconds, Fetched: 5 row(s)
+hive> select eno,name from empdbnew300 join empinfo300
+    > on eno=empno;
+Query ID = cloudera_20230525033939_33c93871-2af5-4a80-b947-05d61ee0db9d
+Total jobs = 1
+Execution log at: /tmp/cloudera/cloudera_20230525033939_33c93871-2af5-4a80-b947-05d61ee0db9d.log
+2023-05-25 03:39:25	Starting to launch local task to process map join;	maximum memory = 1013645312
+2023-05-25 03:39:32	Dump the side-table for tag: 1 with group count: 6 into file: file:/tmp/cloudera/7a7832b0-6fad-4e9c-9a4b-4f0a11702437/hive_2023-05-25_03-39-11_002_5829013753436400794-1/-local-10003/HashTable-Stage-3/MapJoin-mapfile01--.hashtable
+2023-05-25 03:39:32	Uploaded 1 File to: file:/tmp/cloudera/7a7832b0-6fad-4e9c-9a4b-4f0a11702437/hive_2023-05-25_03-39-11_002_5829013753436400794-1/-local-10003/HashTable-Stage-3/MapJoin-mapfile01--.hashtable (368 bytes)
+2023-05-25 03:39:32	End of local task; Time Taken: 7.475 sec.
+Execution completed successfully
+MapredLocal task succeeded
+Launching Job 1 out of 1
+Number of reduce tasks is set to 0 since there's no reduce operator
+Starting Job = job_1685003622237_0004, Tracking URL = http://quickstart.cloudera:8088/proxy/application_1685003622237_0004/
+Kill Command = /usr/lib/hadoop/bin/hadoop job  -kill job_1685003622237_0004
+Hadoop job information for Stage-3: number of mappers: 1; number of reducers: 0
+2023-05-25 03:39:59,863 Stage-3 map = 0%,  reduce = 0%
+2023-05-25 03:40:24,516 Stage-3 map = 100%,  reduce = 0%, Cumulative CPU 4.03 sec
+MapReduce Total cumulative CPU time: 4 seconds 30 msec
+Ended Job = job_1685003622237_0004
+MapReduce Jobs Launched: 
+Stage-Stage-3: Map: 1   Cumulative CPU: 4.03 sec   HDFS Read: 5914 HDFS Write: 0 SUCCESS
+Total MapReduce CPU Time Spent: 4 seconds 30 msec
+OK
+Time taken: 75.801 seconds
+hive> 
+
+

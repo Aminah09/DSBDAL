@@ -1,0 +1,146 @@
+[cloudera@quickstart ~]$ hbase shell
+2023-05-11 23:43:55,665 INFO  [main] Configuration.deprecation: hadoop.native.lib is deprecated. Instead, use io.native.lib.available
+HBase Shell; enter 'help<RETURN>' for list of supported commands.
+Type "exit<RETURN>" to leave the HBase Shell
+Version 1.0.0-cdh5.4.2, rUnknown, Tue May 19 17:07:29 PDT 2015
+
+hbase(main):013:0> list
+TABLE                                                                           
+flight                                                                          
+studentdetails                                                                  
+2 row(s) in 0.0140 seconds
+
+hbase(main):004:0> create 'flight','finfo','fsch'
+0 row(s) in 3.6040 seconds
+
+=> Hbase::Table - flight
+hbase(main):005:0> put 'flight', 1,'finfo:source','pune'
+0 row(s) in 1.1220 seconds
+
+hbase(main):006:0> put 'flight', 1,'finfo:dest','mumbai'
+0 row(s) in 0.0380 seconds
+
+hbase(main):007:0> put 'flight', 1,'fsch:at','10:25 a.m.'
+0 row(s) in 0.0500 seconds
+
+hbase(main):008:0> put 'flight', 1,'fsch:dt','11:25 a.m.'
+0 row(s) in 0.0750 seconds
+
+hbase(main):009:0> put 'flight', 2,'finfo:source','delhi'
+0 row(s) in 0.0180 seconds
+
+hbase(main):010:0> put 'flight', 2,'finfo:dest','nagpur'
+0 row(s) in 0.0320 seconds
+
+hbase(main):011:0> put 'flight', 2,'fsch:at','11:25 a.m.'
+0 row(s) in 0.0440 seconds
+
+hbase(main):012:0> put 'flight', 2,'fsch:dt','12:25 p.m.'
+0 row(s) in 0.0230 seconds
+
+hbase(main):013:0> scan 'flight'
+ROW                   COLUMN+CELL                                               
+ 1                    column=finfo:dest, timestamp=1684950614006, value=mumbai  
+ 1                    column=finfo:source, timestamp=1684950593352, value=pune  
+ 1                    column=fsch:at, timestamp=1684950663148, value=10:25 a.m. 
+ 1                    column=fsch:dt, timestamp=1684950672979, value=11:25 a.m. 
+ 2                    column=finfo:dest, timestamp=1684950715148, value=nagpur  
+ 2                    column=finfo:source, timestamp=1684950697931, value=delhi 
+ 2                    column=fsch:at, timestamp=1684950740174, value=11:25 a.m. 
+ 2                    column=fsch:dt, timestamp=1684950754035, value=12:25 p.m. 
+2 row(s) in 0.1640 seconds
+
+hbase(main):014:0> alter 'flight',NAME=>'revenue'
+Updating all regions with the new schema...
+0/1 regions updated.
+1/1 regions updated.
+Done.
+0 row(s) in 3.5090 seconds
+
+hbase(main):015:0> put 'flight' ,2,'revenue:rs','45000'
+0 row(s) in 0.1120 seconds
+
+hbase(main):016:0> scan 'flight'
+ROW                   COLUMN+CELL                                               
+ 1                    column=finfo:dest, timestamp=1684950614006, value=mumbai  
+ 1                    column=finfo:source, timestamp=1684950593352, value=pune  
+ 1                    column=fsch:at, timestamp=1684950663148, value=10:25 a.m. 
+ 1                    column=fsch:dt, timestamp=1684950672979, value=11:25 a.m. 
+ 2                    column=finfo:dest, timestamp=1684950715148, value=nagpur  
+ 2                    column=finfo:source, timestamp=1684950697931, value=delhi 
+ 2                    column=fsch:at, timestamp=1684950740174, value=11:25 a.m. 
+ 2                    column=fsch:dt, timestamp=1684950754035, value=12:25 p.m. 
+ 2                    column=revenue:rs, timestamp=1684950896326, value=45000   
+2 row(s) in 0.3250 seconds
+
+hbase(main):017:0> alter 'flight',NAME=>'revenue',METHOD=>'delete'
+Updating all regions with the new schema...
+0/1 regions updated.
+1/1 regions updated.
+Done.
+0 row(s) in 3.3490 seconds
+
+hbase(main):018:0> scan 'flight'
+ROW                   COLUMN+CELL                                               
+ 1                    column=finfo:dest, timestamp=1684950614006, value=mumbai  
+ 1                    column=finfo:source, timestamp=1684950593352, value=pune  
+ 1                    column=fsch:at, timestamp=1684950663148, value=10:25 a.m. 
+ 1                    column=fsch:dt, timestamp=1684950672979, value=11:25 a.m. 
+ 2                    column=finfo:dest, timestamp=1684950715148, value=nagpur  
+ 2                    column=finfo:source, timestamp=1684950697931, value=delhi 
+ 2                    column=fsch:at, timestamp=1684950740174, value=11:25 a.m. 
+ 2                    column=fsch:dt, timestamp=1684950754035, value=12:25 p.m. 
+2 row(s) in 0.4930 seconds
+
+hbase(main):019:0> get 'flight',1
+COLUMN                CELL                                                      
+ finfo:dest           timestamp=1684950614006, value=mumbai                     
+ finfo:source         timestamp=1684950593352, value=pune                       
+ fsch:at              timestamp=1684950663148, value=10:25 a.m.                 
+ fsch:dt              timestamp=1684950672979, value=11:25 a.m.                 
+4 row(s) in 0.0680 seconds
+
+hbase(main):020:0> get 'flight','1',COLUMN=>'finfo:source'
+COLUMN                CELL                                                      
+ finfo:source         timestamp=1684950593352, value=pune                       
+1 row(s) in 0.0440 seconds
+
+hbase(main):021:0> get 'flight','1',COLUMN=>['finfo:source','finfo:dest']
+COLUMN                CELL                                                      
+ finfo:dest           timestamp=1684950614006, value=mumbai                     
+ finfo:source         timestamp=1684950593352, value=pune                       
+2 row(s) in 0.0270 seconds
+
+hbase(main):022:0> scan 'flight',COLUMNS=>'finfo:source'
+ROW                   COLUMN+CELL                                               
+ 1                    column=finfo:source, timestamp=1684950593352, value=pune  
+ 2                    column=finfo:source, timestamp=1684950697931, value=delhi 
+2 row(s) in 0.0200 seconds
+
+hbase(main):023:0> 
+hbase(main):001:0> list
+TABLE                                                                           
+flight                                                                          
+studentdetails                                                                  
+2 row(s) in 0.8780 seconds
+
+=> ["flight", "studentdetails"]
+hbase(main):002:0> create 'emphive300','cf'
+0 row(s) in 2.5440 seconds
+
+=> Hbase::Table - emphive300
+hbase(main):003:0> scan emphive300
+NameError: undefined local variable or method `emphive300' for #<Object:0x8aefa84>
+
+hbase(main):004:0> scan 'emphive300'
+ROW                   COLUMN+CELL                                               
+ 1                    column=cf:name, timestamp=1685009382240, value= Kevin     
+ 2                    column=cf:name, timestamp=1685009382240, value= John      
+ 3                    column=cf:name, timestamp=1685009382240, value= Mark      
+ 4                    column=cf:name, timestamp=1685009382240, value= Lucas     
+ 5                    column=cf:name, timestamp=1685009382240, value= Watson    
+5 row(s) in 0.3370 seconds
+
+hbase(main):005:0> 
+
+
