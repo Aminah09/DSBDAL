@@ -42,4 +42,4 @@ g. Network Data visualization<br>
 1. Create a review scrapper for any ecommerce website to fetch real time comments, reviews,
 ratings, comment tags, customer name using Python.<br>
 2. Develop a mini project in a group using different predictive models techniques to solve any real life
-problem. (Refer link dataset- https://www.kaggle.com/tanmoyie/us-graduate-schools- admissionparameters)
+problem. (Refer link dataset- https://www.kaggle.com/tanmoyie/us-graduate-schools-admission-parameters)
