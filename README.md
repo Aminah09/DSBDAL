@@ -1,4 +1,4 @@
-# DSBDAL
+# DS & BDA Lab
 SPPU Third Year IT Data Science & Big Data Analytics Lab Assignments
 
 ## List of Assignments 
